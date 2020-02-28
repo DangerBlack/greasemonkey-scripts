@@ -102,13 +102,15 @@ let action = "still";
 let pause = 0;
 let tick = 100;
 let energy = 10;
+let is_moving = false;
+
 
 cat.onclick = () =>
 {
   const heart = document.createElement('heart');
   body.appendChild(heart); 
-  heart.style['top']= (position_y - 24)+"px";
-  heart.style['left']= (position + (cat_w/2 - 12))+"px";
+  heart.style['top']= (parseInt(cat.style['top']) - 24)+"px";
+  heart.style['left']= (parseInt(cat.style['left']) + (cat_w/2 - 12))+"px";
   energy+= 50;
   setTimeout(() =>
   {
@@ -116,11 +118,40 @@ cat.onclick = () =>
   }, 600);
 }
 
+cat.addEventListener('mousedown', e => 
+{
+  is_moving = true;
+});
+
+window.addEventListener('mousemove', e => 
+{
+  if(is_moving === true) 
+  {
+      position = e.clientX - cat_w/2;
+  		position_y = e.clientY;
+    	cat.style['left'] = position+"px ";
+      cat.style['top'] = position_y+"px ";
+  }
+});
+
+window.addEventListener('mouseup', e => 
+{
+  if(is_moving === true) 
+  {
+    position = e.clientX - cat_w/2;
+  	position_y = e.clientY;
+    is_moving = false;
+  }
+});
+
 
 
 
 function random_action(action)
 {
+  if(is_moving)
+    return 'blow';
+  
  	const new_action = choose(transition[action].actions);
   
   if(new_action === 'turn')
@@ -191,10 +222,16 @@ setInterval(() =>
   {
     position_y+=10;
     
-    if(position_y > (window.innerHeight - cat_h))
+    if(position_y >= (window.innerHeight - cat_h))
       position_y = window.innerHeight - cat_h;
     
     cat.style['top']= (position_y)+"px";
+  }
+  
+  if(position_y >= (window.innerHeight - cat_h))
+  {
+      position_y = window.innerHeight - cat_h;
+      cat.style['top']= (position_y)+"px";
   }
 
 }, 100);
