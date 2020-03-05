@@ -54,6 +54,14 @@ heart
 	background-size: 100% 100%;
 }
 
+meow
+{
+  position: fixed;
+	display: block;
+	width: 100px;
+	height: 24px;
+}
+
 `
 );
 
@@ -75,11 +83,11 @@ const state = {
 }
 
 const transition = {
-  "still": {time:300 , actions:["still","front","scare","rest","blow","walk_0","jump_0","turn"], energy: 0},
-  "front": {time:600 , actions:["still","front","scare","rest","blow","turn"], energy: -1},
-  "scare": {time:300 , actions:["still","front","scare","rest","blow","walk_0","jump_0","turn"], energy: -1},
-  "rest": {time:900 , actions:["rest","still"], energy: 2},
-  "blow": {time:300 , actions:["still","front","scare","rest","blow","turn"], energy: -1},
+  "still": {time:300 , actions:["still","front","scare","rest","blow","walk_0","jump_0","meow","turn"], energy: 0},
+  "front": {time:600 , actions:["still","front","scare","rest","blow","meow","turn"], energy: -1},
+  "scare": {time:300 , actions:["still","front","scare","rest","blow","walk_0","jump_0","meow","turn"], energy: -1},
+  "rest": {time:900 , actions:["rest","still","meow"], energy: 2},
+  "blow": {time:300 , actions:["still","front","scare","rest","blow","meow","turn"], energy: -1},
   "walk_0": {time:200 , actions:["walk_1","walk_1","walk_1","still"], energy: -2},
   "walk_1": {time:200 , actions:["still","walk_0","walk_0","walk_0","jump_0","jump_0"], energy: -2},
   "jump_0": {time:0 , actions:["jump_1"], energy: -5},
@@ -103,7 +111,7 @@ let pause = 0;
 let tick = 100;
 let energy = 10;
 let is_moving = false;
-
+const meowing = ['Meow','Mrrowow','Wrrrao','Maaorrao','Prrrrrrr','Mroww','Meow Meow','Wrrrrmmaao'];
 
 cat.onclick = () =>
 {
@@ -145,6 +153,20 @@ window.addEventListener('mouseup', e =>
 });
 
 
+function say_meow()
+{
+  const word = choose(meowing);
+  console.log(word);
+  const meow = document.createElement('meow');
+  body.appendChild(meow);
+  meow.innerText = word;
+  meow.style['top']= (parseInt(cat.style['top']) - 24)+"px";
+  meow.style['left']= (parseInt(cat.style['left']) + (cat_w/2 - 12))+"px";
+  setTimeout(() =>
+  {
+   	body.removeChild(meow); 
+  }, 600);
+}
 
 
 function random_action(action)
@@ -160,6 +182,14 @@ function random_action(action)
     speed = -speed;
     return action;
   }
+  
+  if(new_action === 'meow')
+  {
+    say_meow();
+    energy+= transition[new_action].energy; 
+    return action;
+  }
+  
   
   if(energy + transition[new_action].energy < 0)
     return random_action(action);
